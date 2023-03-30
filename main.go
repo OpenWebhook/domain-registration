@@ -65,11 +65,14 @@ func main() {
 
 		fmt.Println("Attempting to create dns record for " + name)
 
+		proxied := true
+
 		var createDNSRecordParams = cloudflare.CreateDNSRecordParams{
 			Content: dnsRecordContent,
 			Name:    name,
 			Type:    "CNAME",
 			Comment: "Github user wildcard",
+			Proxied: &proxied,
 			TTL:     3600,
 		}
 
