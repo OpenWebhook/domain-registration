@@ -28,6 +28,10 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "OK"})
+	})
+
 	router.POST("/", func(c *gin.Context) {
 		var json JSONGithubWebhook
 		if err := c.ShouldBindJSON(&json); err != nil {
