@@ -40,10 +40,10 @@ func main() {
 		}
 
 		if json.Action != "created" {
-			c.JSON(http.StatusNotAcceptable, gin.H{"message": "only created events are accepted"})
+			c.JSON(http.StatusOK, gin.H{"message": "only created events are accepted"})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "star gazer created"})
+		c.JSON(http.StatusCreated, gin.H{"message": "star gazer created"})
 	})
 
 	router.Run(":" + port)
