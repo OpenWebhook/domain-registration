@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/cloudflare/cloudflare-go"
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 )
@@ -20,6 +23,16 @@ type JSONGithubWebhook struct {
 
 func main() {
 	port := os.Getenv("PORT")
+
+	api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cloudflareZoneID, err := api.ZoneIDByName(os.Getenv("CLOUDFLARE_DOMAIN"))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if port == "" {
 		log.Fatal("$PORT must be set")
@@ -44,7 +57,19 @@ func main() {
 			return
 		}
 		log.Println(json.Sender.Login)
-		c.JSON(http.StatusCreated, gin.H{"message": "star gazer created"})
+
+		records, _, err := api.ListDNSRecords(context.Background(), cloudflare.ZoneIdentifier(cloudflareZoneID), cloudflare.ListDNSRecordsParams{})
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		for _, r := range records {
+			fmt.Printf("%s: %s\n", r.Name, r.Content)
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"message": "star gazer created", "numberOfRecords": len(records)})
+
 	})
 
 	router.Run(":" + port)
