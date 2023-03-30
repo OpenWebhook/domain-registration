@@ -43,6 +43,7 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"message": "only created events are accepted"})
 			return
 		}
+		log.Println(json.Sender.Login)
 		c.JSON(http.StatusCreated, gin.H{"message": "star gazer created"})
 	})
 
